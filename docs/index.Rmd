@@ -21,9 +21,9 @@ class: center, middle, title-slide
 # fluxplane
 ## crossplane과 flux로 구축하는 Infra as code 
 
-### <https://mrchypark.github.io/fluxplane-infra-as-code>
+### <https://mrchypark.github.io/fluxplane>
 
-#### [[의견 및 오류 신고]](https://github.com/mrchypark/fluxplane-infra-as-code/issues/new)
+#### [[의견 및 오류 신고]](https://github.com/mrchypark/fluxplane/issues/new)
 
 ### 박찬엽
 
