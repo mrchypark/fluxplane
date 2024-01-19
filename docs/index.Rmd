@@ -1,5 +1,5 @@
 ---
-title: "infra as code"
+title: "fluxplane"
 author: "박찬엽"
 date: "2024년 1월 20일"
 output:
@@ -24,8 +24,64 @@ class: center, middle, title-slide
 ### <https://mrchypark.github.io/fluxplane-infra-as-code>
 
 #### [[의견 및 오류 신고]](https://github.com/mrchypark/fluxplane-infra-as-code/issues/new)
-#### [스타누르기](https://github.com/mrchypark/fluxplane-infra-as-code)는 컨텐츠 제작자를 춤추게 합니다.
 
 ### 박찬엽
 
 ### 2024년 1월 20일
+
+---
+class: split-50 
+
+.column[.content.vmiddle.right[
+    ![](https://avatars2.githubusercontent.com/u/6179259?v=4&s=460)
+]]
+.column[.content.left[
+<br>
+<br>
+<br>
+### 박찬엽     
+- 초짜 CTO(@Conalog)
+- `r icons::fontawesome$brands$youtube` 팟캐스트 데이터홀릭 .blue[박박사]
+- `r icons::fontawesome$brands$github` .gray[**GITHUB**]@[mrchypark](https://github.com/mrchypark)
+]]
+---
+## 데이터홀릭
+
+- 2019년 4월 시작한 데이터 분야 전문 팟캐스트
+- 현재 김팀장, 조과장, 박박사가 게스트를 모시고 녹음
+- 팟빵 2,700여명, 유튜브 6,300여명 구독 중
+- 여러 기업의 채용 방송, 게스트 방송 진행
+
+![](https://user-images.githubusercontent.com/6179259/298201006-7f45e2a6-717c-49fc-9ecb-eec4faf52240.png)
+
+**구독, 좋아요, 후원, 기업 강의, 채용 방송 문의등 대환영!**
+
+<https://www.youtube.com/@dataholic4>
+
+---
+
+class: split-40 
+
+.column[.content.left[
+.split-20[.column[
+]
+.column[.content[
+<br>
+## Conalog
+
+#### 태양광 패널별 모니터링 및 디지털 O&M 
+
+- 패널별 모니터링을 위한 IoT 장치
+- 데이터 수집을 위한 엣지 컴퓨터
+- 시계열 데이터 처리와 저장
+- 모니터링 대시보드
+
+]]]]]
+.column[.content.right[
+<br>
+<br>
+<img src="https://user-images.githubusercontent.com/6179259/298202115-438ed345-ed4a-48a1-a6f3-8a9b8d933759.png" width=100%>
+]]
+
+---
+
