@@ -1,15 +1,31 @@
 ---
-title: "Presentation Ninja"
-subtitle: "⚔<br/>with xaringan"
-author: "Yihui Xie"
-institute: "RStudio, PBC"
-date: "2016/12/12 (updated: `r Sys.Date()`)"
+title: "infra as code"
+author: "박찬엽"
+date: "2024년 1월 20일"
 output:
   xaringan::moon_reader:
+    seal: false
+    css: ["default", "ninjutsu", "custom.css"]
     lib_dir: libs
+    # includes:
+    #   in_header: google_analytics.html
     nature:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+      ratio: '16:9'
 ---
-  dksdks
+
+class: center, middle, title-slide
+
+# fluxplane
+## crossplane과 flux로 구축하는 Infra as code 
+
+### <https://mrchypark.github.io/fluxplane-infra-as-code>
+
+#### [[의견 및 오류 신고]](https://github.com/mrchypark/fluxplane-infra-as-code/issues/new)
+#### [스타누르기](https://github.com/mrchypark/fluxplane-infra-as-code)는 컨텐츠 제작자를 춤추게 합니다.
+
+### 박찬엽
+
+### 2024년 1월 20일
