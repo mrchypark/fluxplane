@@ -1,0 +1,4 @@
+^renv$
+^renv\.lock$
+^fluxplane\.Rproj$
+^\.Rproj\.user$
