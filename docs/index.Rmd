@@ -180,3 +180,315 @@ dev cluster
 monitoring cluster
 prod cluster
 edge cluster
+
+
+
+management 
+
+
+azure devops와 azure
+github aws
+github과 azure를 겼었음
+
+
+aws는 IAM이 선언적으로 사용하기 좋은 것이 강점
+azure는 aad가 있는데, 너무 어려움.(노력이 부족한지도...)
+
+Devops와 azure에서는 action to resource의 credential을 알아서 수행해줌.
+선언적이지 않아도 좋았다.
+
+비밀의 자동 운영에 매력을 느껴, 사람이 보지도 않고 연결해서 사용하는 방식을 선호.
+어쩔 수 없는 외부 주입만 수동으로 처리 중.
+
+github aws에서는 push 방식을 사용했음. > crossplane의 시작
+crossplane의 irsa 선언이 매우 만족스러웠음.
+
+
+github azure에서는 pull 방식을 시도 > 여기가 flux의 시작
+
+
+
+
+
+
+
+본격 야믈러에게 생기는 고민은 yaml 파일이 장황하고 겹치는 부분이 매우 많다는 것
+
+이걸 묶어서 잘 쓰고 싶은데, 가장 단순한 방식이 찾아바꾸기(sed)
+점점 찾아바꾸기가 힘들 때쯤 전통의 강자 helm 이 등장함.
+
+탬플릿 방식의 장점은 완성된 차트를 사용할 때는 캡슐화처럼 사용하는 사람이 내부를 잘 몰라도
+알아서 잘 고려가 되어 있고 설명서도 잘 되어 있으면 좋은 반면에, 문제가 생기면 해결하기가 어려움
+
+대충 helm chart 예시
+
+여긴 템플릿 테크라고 볼 수 있음
+manifest > helm > helmfile
+
+이 과정에서 템플릿 파일, value파일, helmfile을 가지고 배포함.
+helmfile이 왜 필요했냐?
+helm 차트가 차트 의존이 가능하긴 한데, 의존할 차트가 의존설계를 고려하지 않으면 사용하기 어려움.
+그래서 의존 설계 및 배포를 담당해줄 도구가 필요했음.
+
+템플릿에 템플릿이 있다보니 규모에 비해 작업이 복잡해짐.
+
+
+다시는 helm을 사용하지 않으리라 다짐.
+(역시 진정한 yamler는 템플릿따위 사파지.)
+
+
+이제 다음 도구로 찾은 것이 kpt 였음
+(사용하지 마세요)
+https://kpt.dev/
+
+kpt는 krm을 따르는 도구로, 배포 설정도 모두 data 이며 선언적이어야 한다는 생각으로 설계됨.
+
+장점: 완전한 manifest임. 진정한 찾아바꾸기랄까.
+단점: 생태계가 작음
+
+그런데 같은 개념과 설계를 다른 곳에서 채택했다는 것을 알게 되었음
+
+kustomize componant
+아직 사용해보지 못했지만 기대하고 있는 기능임.
+이따가 넌 다시 나오자
+
+
+이 설계중에 패키징 도구 선정의 이슈를 뒤로하고 pull 방식 도입을 위해
+최종 flux를 선택하고 구성하였음.
+
+crossplane으로 클러스터를 생성하기 때문에 다른 분들과 좀 다른 구성이 가능했음.
+
+메니지먼트 클러스터
+- 클라우드 리소스 관리
+- 클러스터 내부 리소스 관리
+
+그래서 flux가 management cluster 에만 있음. > `fluxplane`
+
+이 설계의 불편한 점이 하나 있음.
+azure를 기준으로 지금 구성에서는 대부분의 클라우드 리소스 생성이 blob임.
+근데 blob 생성시 secret이 management 클러스터에 생성되고 사용해야 하는 클러스터에 없는 문제가 생김
+
+> 이렇게 해결했음.
+
+
+여전히 secret 관리는 최대한 자동에 의지하고, 수동은 최소화하되 도구는 추가하지 않는다.
+
+fluxplane이 있고 나서는 이미 기능이 있는 패키징 도구가 3개가 됨
+flux kustomization 과 kustomize component, crossplane xrd. 궁극의 패키징 도구는 역시 operator임. 
+
+flux kustomization 는 암묵적으로 동작하는 kustomize의 의존구성을 명시적으로 처리해줌.
+이 둘을 사용하는 것으로 패키징을 어느 정도 완성할 수 있음.
+
+crossplane xrd는 크로스플레인의 자체 정의리소스 방식임.
+전부 k8s 방식을 따르기 때문에 아주 어렵지는 않지만 조금 다른 부분을 이해해야 함.
+
+operator 는 crd 선언과 서버개발을 모두 하는 궁극의 방식으로 코드로 동작을 다룰수 있음
+
+xrd 예시
+
+
+flux 의 컨트롤러 배포시 고려사항
+
+라이프사이클이 다른 도구들은 분리해서 배포
+
+---
+
+class: center, middle, title-slide
+
+# infra as code
+
+---
+
+class: center, middle, title-slide
+
+
+# - azure devops + azure [kubernetes]
+# - github + aws [crossplane]
+# - github + azure [flux]
+
+---
+
+# azure devops + azure
+
+대부분의 팀이 aws를 사용할 때, 우리팀만 azure를 사용했음.
+
+불안정한 클라우드 선택 상황 > kubernates 판단
+
+k8s 로 운영하기 어려운 storage와 database만 클라우드 사용하고 모두 k8s 사용
+
+전체에서 운영자 혼자였기 때문에, 일을 처음부터 줄일 방법이 필요헀음.
+
+---
+
+# kubernetes
+
+선언적 리소스 관리로 운영 비용을 줄일 수 있길 기대.
+
+컨트롤러가 선언과 현재 상태를 확인하여 지속적으로 선언대로 현재 상태가 되도록 만들어 줌.
+
+이 동작을 확장하는 사용자 정의 컨트롤러를 작성할 수 있는데, 이를 오퍼레이터라고 함.
+
+아무튼, 실제 도입 효과는 리소스 생성의 문제를 해결하는 피드백 루프를 제공.
+---
+
+# 패키징 요구
+
+
+점점 리소스 파일이 많아지고 중복이 많아짐.
+복붙은 내 친구지만 슬슬 보내줄 때가 되었음.
+
+대표적으로 찾아바꾸기(sed) 시도
+
+점점 찾아바꾸기로 감당이 안됨.
+
+---
+
+# helm
+
+k8s에서 패키징의 사실상 표준
+
+하지만 템플릿 파일과 함께 문제를 해결하는 것이 어려움.
+의존성 설계를 위해서 더 많은 것을 해야 함.
+
+## helmfile
+
+helm 차트의 의존성 배포를 담당.
+
+대신 점점 배포용 value 파일이 계속 늘어나고, 명령이 중첩되면서 규모가 커짐에 따라 어려움이 많이 증가.
+
+---
+
+# 내부 패키징 도구로 helm은 사용하지 말아야겠다.
+
+---
+
+# azure devops + cloud
+
+- 연동이 매우 잘 되어 있음.
+- 비밀을 사용자가 보지도 못한다는 설계를 배움.
+- 아직 클라우드 리소스가 많지 않아서 그 부분은 수동이 가능한 정도.
+
+---
+
+# github + aws
+
+github 으로 넘어오면서 비밀을 사용자가 보지도 못하게 한다는 설계를 사용할 수 없었음.
+
+근데 IRSA라는 것이 있다는 것을 알게됨.
+
+aws 콘솔은 참...
+
+이걸 선언해서 사용할 방법이 필요했음.
+
+---
+
+# terraform
+
+전통의 강자.
+hcl이라는 자체 언어 사용
+풍부하고 활발한 생태계
+
+
+하지만 저에게는 hcl의 허들이 높고 이해하기 어려웠음.
+
+---
+
+# crossplane
+
+클라우드 인프라의 선언적 관리를 k8s resource 와 같은 방식으로 수행해줌.
+
+이미 k8s 가 익숙해져있는 상황에서 매우 만족스러웠음.
+
+xrd라는 패키징도 있다고 해서 우선 도입.
+
+---
+
+# crossplane 구성
+
+기본적으로 오퍼레이터임. cluster내에 배포되어 동작하면서
+
+
+---
+
+# IRSA 예시
+
+```yaml
+
+
+```
+
+---
+
+# 점점 yamler의 싹수가 보이기 시작
+
+---
+
+# github + azure
+
+현재 회사의 구성
+
+crossplane을 사용하더라도, 클라우드의 메니지드 리소스를 최대한 배제하는 방향의 설계가 필요
+on-prom 설계가 고려되어야 했음.
+그래서 storage 리소스만 쓰고 모두 k8s 내에서 해결 중.
+
+모든 개발자가 일정 수준의 yaml 파일을 구성하는 것으로 인프라 관리를 할 수 있게 해야함.
+
+push 방식의 문제점은 자동 관리되는 리소스를 코드 이외에 개입이 없도록 해야하는데, 이 부분 제어가 어려움.
+
+---
+
+# flux
+
+flux는 pull 방식의 gitops를 제공하는 도구임.
+push 방식에서는 그 자체의 문제는 아니지만, 상태를 들고 있는 주체가 없는 설계가 많음
+그러면 클라우드에 직접 선언을 반영하고 중간에 관리하는 상태가 없어짐
+
+pull 방식은 방식의 특성상 pull해가야 하는 주체가 항상 동작중이며, 
+그 주체가 현태 상태와 같은지 확인하는 과정을 수행할 수 있음.
+
+그래서 pull 방식의 도구 중 argoCD vs flux에서 flux를 선택하게 됨.
+
+---
+
+# flux
+
+artifact를 만들 source와 controller로 구성됨.
+
+source는 반영해야 할 선언들의 원천
+controller는 그 선언을 반영하는 operator.
+
+```yaml
+
+```
+
+---
+
+# 선택한 구성
+
+git repository
+helm repository
+*oci repository*
+bucket
+helm chart
+
+*kustomize controller*
+helm controller
+
+---
+
+# flux kustomization
+
+flux가 기본 kustomize의 단점 보완해줌.
+
+의존성
+
+healthcheck
+
+
+```yaml
+
+
+```
+
+---
+
