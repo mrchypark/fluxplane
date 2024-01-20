@@ -503,8 +503,6 @@ spec:
           spec:
             type: object
             properties:
-              region:
-                type: string
 ...
 ```
 ---
@@ -520,3 +518,9 @@ class: center, middle, title-slide
 # fluxplane의 길
 # ~= 
 # yamler의 길
+
+---
+
+class: center, middle, title-slide
+
+# 감사합니다.
