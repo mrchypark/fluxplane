@@ -257,9 +257,9 @@ aws 콘솔은 참...
 
 # IRSA: IAM Roles for Service Accounts
 
-[예시코드](./demo/irsa/)
+[예시코드](https://github.com/mrchypark/fluxplane/tree/main/demo/irsa)
 
-![](https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcIQoiz%2FbtrLEaRd299%2FQJr5ko3ScAhiOXZSWgUXa0%2Fimg.png)
+<img src=https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcIQoiz%2FbtrLEaRd299%2FQJr5ko3ScAhiOXZSWgUXa0%2Fimg.png>
 
 ---
 
