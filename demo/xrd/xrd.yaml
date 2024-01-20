@@ -1,0 +1,32 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xpostgresqls.db.awesome.co.kr
+spec:
+  group: db.awesome.co.kr
+  names:
+    kind: XPostgresql
+    plural: xpostgresqls
+  claimNames:
+    kind: Postgresql
+    plural: postgresqls
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              namespace:
+                type: string
+                description: 리소스를 배치하기 위한 네임스페이스입니다.
+              pg_image:
+                default: docker.io/bitnami/postgresql:14.6.0-debian-11-r8
+                type: string
+                description: postgres image 주소입니다. 전체 주소가 필요합니다.
+        required:
+          - namepace
