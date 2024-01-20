@@ -1,0 +1,232 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xpostgresqls.db.awesome.co.kr
+spec:
+  compositeTypeRef:
+    apiVersion: db.awesome.co.kr/v1alpha1
+    kind: XPostgresql
+  resources:
+    - base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: secretgenerator.mittwald.de/v1alpha1
+              kind: StringSecret
+              metadata:
+                name: #patched
+                namespace: #patched
+              spec:
+                forceRegenerate: false
+                fields:
+                  - fieldName: postgres-password
+                    encoding: hex
+                    length: "15"
+          providerConfigRef:
+            name: default
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "pg-%s-stringsecret"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+        - fromFieldPath: spec.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+    - base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:              
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: #patched
+                namespace: #patched
+                labels: 
+                  app: #patched
+              spec:
+                type: ClusterIP
+                sessionAffinity: None
+                ports:
+                - name: tcp
+                  port: 5432
+                  targetPort: tcp
+                selector:
+                  app: #patched
+          providerConfigRef:
+            name: default
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "pg-%s-service"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+        - fromFieldPath: spec.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.metadata.labels.app
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.spec.selector.app
+    - base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: #patched
+                namespace: #patched
+                labels:
+                  app: #patched
+              spec:
+                replicas: 1
+                selector:
+                  matchLabels:
+                    app: #patched
+                template:
+                  metadata:
+                    name: #patched
+                    labels:
+                      app: #patched
+                  spec:
+                    serviceAccountName: default
+                    securityContext:
+                      fsGroup: 1001
+                    containers:
+                    - name: postgresql
+                      image: #patched
+                      imagePullPolicy: IfNotPresent
+                      securityContext:
+                        runAsUser: 1001
+                      env:
+                      # Authentication
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                          secretKeyRef:
+                            name: #patched
+                            key: postgres-password
+                      - name: BITNAMI_DEBUG
+                        value: "false"
+                      - name: POSTGRESQL_PORT_NUMBER
+                        value: "5432"
+                      - name: POSTGRESQL_VOLUME_DIR
+                        value: /bitnami/postgresql
+                      - name: PGDATA
+                        value: /bitnami/postgresql/data
+                      - name: POSTGRES_DB
+                        value: edgedb
+                      # Replication
+                      # Initdb
+                      # Standby
+                      # LDAP
+                      - name: POSTGRESQL_ENABLE_LDAP
+                        value: "no"
+                      # TLS
+                      - name: POSTGRESQL_ENABLE_TLS
+                        value: "no"
+                      # Audit
+                      - name: POSTGRESQL_LOG_HOSTNAME
+                        value: "false"
+                      - name: POSTGRESQL_LOG_CONNECTIONS
+                        value: "false"
+                      - name: POSTGRESQL_LOG_DISCONNECTIONS
+                        value: "false"
+                      - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+                        value: "off"
+                      # Others
+                      - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+                        value: error
+                      - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+                        value: pgaudit
+                      ports:
+                      - name: tcp
+                        containerPort: 5432
+                      livenessProbe:
+                        failureThreshold: 6
+                        initialDelaySeconds: 30
+                        periodSeconds: 10
+                        successThreshold: 1
+                        timeoutSeconds: 5
+                        exec:
+                          command:
+                          - /bin/sh
+                          - -c
+                          - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                      readinessProbe:
+                        failureThreshold: 6
+                        initialDelaySeconds: 5
+                        periodSeconds: 10
+                        successThreshold: 1
+                        timeoutSeconds: 5
+                        exec:
+                          command:
+                          - /bin/sh
+                          - -c
+                          - -e
+                          - |
+                            exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                            [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+                      resources:
+                        limits: {}
+                        requests:
+                          cpu: 250m
+                          memory: 256Mi
+                      volumeMounts:
+                      - name: dshm
+                        mountPath: /dev/shm
+                    volumes:
+                    - name: dshm
+                      emptyDir:
+                        medium: Memory
+          providerConfigRef:
+            name: default
+          references:
+            - dependsOn:
+                apiVersion: v1
+                kind: Secret
+                name: # patched
+                namespace: # patched
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "pg-%s-postgres"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+        - fromFieldPath: spec.namespace
+          toFieldPath: spec.forProvider.manifest.metadata.namespace
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.metadata.labels.app
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.spec.selector.matchLabels.app
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.spec.template.metadata.name
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.spec.template.metadata.labels.app
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.references[0].dependsOn.name
+        - fromFieldPath: spec.namespace
+          toFieldPath: spec.references[0].dependsOn.namespace
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+        - fromFieldPath: spec.pg_image
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].image
