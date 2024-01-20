@@ -115,55 +115,107 @@ class: center, middle, title-slide
 
 
 ![](https://www.veritis.com/wp-content/uploads/2022/02/azure-devops-offerings.jpg)
-???
+---
 
-대부분의 팀이 aws를 사용할 때, 우리팀만 azure를 사용했음.
+# azure devops + azure
+
+.large[
+대부분의 팀이 aws를 사용 &gt; 우리팀만 azure를 사용함
 
 불안정한 클라우드 선택 상황 &gt; kubernates 판단
 
-k8s 로 운영하기 어려운 storage와 database만 클라우드 사용하고 모두 k8s 사용
+k8s로 운영하기 어려운 storage와 database만 클라우드 사용하고 모두 k8s 사용
 
-전체에서 운영자 혼자였기 때문에, 일을 처음부터 줄일 방법이 필요헀음.
+전체에서 운영자 혼자였기 때문에, 일을 처음부터 줄일 방법이 필요했음]
 
 ---
 
 # kubernetes
 
-선언적 리소스 관리로 운영 비용을 줄일 수 있길 기대.
+![](https://kubernetes.io/images/docs/components-of-kubernetes.svg)
 
-컨트롤러가 선언과 현재 상태를 확인하여 지속적으로 선언대로 현재 상태가 되도록 만들어 줌.
+---
 
-이 동작을 확장하는 사용자 정의 컨트롤러를 작성할 수 있는데, 이를 오퍼레이터라고 함.
+# kubernetes
 
-아무튼, 실제 도입 효과는 리소스 생성의 문제를 해결하는 피드백 루프를 제공.
+.large[선언적 리소스 관리로 운영 비용을 줄일 수 있길 기대.
+
+컨트롤러가 선언과 현재 상태를 확인하여 지속적으로 선언대로 되도록 만들어 줌.
+
+확장하는 사용자 정의 컨트롤러를 작성할 수 있는데, 이를 오퍼레이터라고 함.
+
+아무튼, 실제 도입 효과는 리소스 생성의 문제를 해결하는 피드백 루프를 제공.]
 ---
 
 # 패키징 요구
 
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: awesome-app
+  labels:
+    app: awesome-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: awesome-app
+  template:
+    metadata:
+      labels:
+        app: awesome-app
+    spec:
+      volumes:
+        - name: token-vol
+          emptyDir: {}  
+      initContainers:
+      - name: init-dsn
+        image: bitnami/bitnami-shell:latest
+```
 
-점점 리소스 파일이 많아지고 중복이 많아짐.
+---
+
+# 패키징 요구
+
+.large[점점 리소스 파일이 많아지고 중복이 많아짐.
+
 복붙은 내 친구지만 슬슬 보내줄 때가 되었음.
 
 대표적으로 찾아바꾸기(sed) 시도
 
-점점 찾아바꾸기로 감당이 안됨.
+점점 찾아바꾸기로 감당이 안됨.]   
+
+
+```sh
+sed 's/DEPLOY_NAME/awesome-app/g'
+sed 's/AWESOME_IMAGE/awesome-app-docker-image/g'
+sed 's/AWESOME_IMAGE_TAG/v0.4.15/g'
+```
+
+---
+
+class: center, middle, title-slide
+
+![](https://velog.velcdn.com/images/yange/post/601e5fd9-7d82-41af-adf5-527b681db97f/image.png)
 
 ---
 
 # helm
 
-k8s에서 패키징의 사실상 표준
-
+.large[k8s에서 패키징의 사실상 표준
 하지만 템플릿 파일과 함께 문제를 해결하는 것이 어려움.
-의존성 설계를 위해서 더 많은 것을 해야 함.
+의존성 설계를 위해서 더 많은 것을 해야 함.]
 
-## helmfile
+# helmfile
 
-helm 차트의 의존성 배포를 담당.
+.large[helm 차트의 의존성 배포를 담당.
 
-대신 점점 배포용 value 파일이 계속 늘어나고, 명령이 중첩되면서 규모가 커짐에 따라 어려움이 많이 증가.
+대신 점점 배포용 value 파일이 계속 늘어나고, 명령이 중첩되면서 규모가 커짐에 따라 어려움이 많이 증가.]
 
 ---
+
+class: center, middle, title-slide
 
 # 내부 패키징 도구로 helm은 사용하지 말아야겠다.
 
@@ -171,21 +223,40 @@ helm 차트의 의존성 배포를 담당.
 
 # azure devops + cloud
 
-- 연동이 매우 잘 되어 있음.
-- 비밀을 사용자가 보지도 못한다는 설계를 배움.
-- 아직 클라우드 리소스가 많지 않아서 그 부분은 수동이 가능한 정도.
+
+.large[
+연동이 매우 잘 되어 있음
+
+비밀을 사용자가 보지도 못한다는 설계를 배움
+
+아직 클라우드 리소스가 많지 않아서 그 부분은 수동이 가능한 정도
+]
 
 ---
 
 # github + aws
 
-github 으로 넘어오면서 비밀을 사용자가 보지도 못하게 한다는 설계를 사용할 수 없었음.
+![](https://1.bp.blogspot.com/-K7rSzDdhHKo/YPwgtnnpcUI/AAAAAAAABlo/WoKcI8fa0ME749YOxWFYUDtaSCxcyklfwCLcBGAsYHQ/s720/1_ud2T-tKYh-ZM7juhyVXInw.png)
+
+---
+
+# github + aws
+
+.large[github 으로 넘어오면서 비밀을 사용자가 보지도 못하게 한다는 설계를 사용할 수 없었음.
 
 근데 IRSA라는 것이 있다는 것을 알게됨.
 
 aws 콘솔은 참...
 
-이걸 선언해서 사용할 방법이 필요했음.
+이걸 선언해서 사용할 방법이 필요했음.]
+
+---
+
+# IRSA: IAM Roles for Service Accounts
+
+[예시코드](./demo/irsa/)
+
+![](https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcIQoiz%2FbtrLEaRd299%2FQJr5ko3ScAhiOXZSWgUXa0%2Fimg.png)
 
 ---
 
@@ -215,14 +286,6 @@ xrd라는 패키징도 있다고 해서 우선 도입.
 기본적으로 오퍼레이터임. cluster내에 배포되어 동작하면서
 
 
----
-
-# IRSA 예시
-
-```yaml
-
-
-```
 
 ---
 
