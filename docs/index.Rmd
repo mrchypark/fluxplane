@@ -255,71 +255,70 @@ aws 콘솔은 참...
 
 ---
 
+# 전통의 강자
+
+![](https://d2uleea4buiacg.cloudfront.net/files/8c7/8c7e6ba6534dedf5c5396faf3bc91989e71427d4d156783d54b4d7e4bce84c32.m.png)
+
+---
+
+# crossplane
+
+![](https://docs.crossplane.io/content/media/crossplane-intro-diagram_hud9dc847ee0e2ab0b53319b680d79d1fd_55780_828x273_resize_q75_h2_box_3.webp)
+
+---
+class: center, middle, title-slide
+
+# crossplane으로 IRSA 를 구성해보자.
+
+---
 # IRSA: IAM Roles for Service Accounts
 
 [예시코드](https://github.com/mrchypark/fluxplane/tree/main/demo/irsa)
 
 <img src=https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcIQoiz%2FbtrLEaRd299%2FQJr5ko3ScAhiOXZSWgUXa0%2Fimg.png>
 
----
-
-# terraform
-
-전통의 강자.
-hcl이라는 자체 언어 사용
-풍부하고 활발한 생태계
-
-
-하지만 저에게는 hcl의 허들이 높고 이해하기 어려웠음.
 
 ---
-
-# crossplane
-
-클라우드 인프라의 선언적 관리를 k8s resource 와 같은 방식으로 수행해줌.
-
-이미 k8s 가 익숙해져있는 상황에서 매우 만족스러웠음.
-
-xrd라는 패키징도 있다고 해서 우선 도입.
-
----
-
-# crossplane 구성
-
-기본적으로 오퍼레이터임. cluster내에 배포되어 동작하면서
-
-
-
----
+class: center, middle, title-slide
 
 # 점점 yamler의 싹수가 보이기 시작
 
 ---
+class: center, middle, title-slide
 
-# github + azure
+![](https://venturebeat.com/wp-content/uploads/2019/05/github-azure.png?w=1200&strip=all)
 
-현재 회사의 구성
+---
 
-crossplane을 사용하더라도, 클라우드의 메니지드 리소스를 최대한 배제하는 방향의 설계가 필요
-on-prom 설계가 고려되어야 했음.
-그래서 storage 리소스만 쓰고 모두 k8s 내에서 해결 중.
 
-모든 개발자가 일정 수준의 yaml 파일을 구성하는 것으로 인프라 관리를 할 수 있게 해야함.
+# 회사의 상황
 
-push 방식의 문제점은 자동 관리되는 리소스를 코드 이외에 개입이 없도록 해야하는데, 이 부분 제어가 어려움.
+.large[
+on-prom 대응 필요 > storage 이외 모든 리소스를 k8s 내에 구성
+
+스타트업 특유의 개발자 부족 > 모든 사람이 인프라 일을 할 수 있게 만들어야 함
+
+소프트웨어로 비용을 요구하기 어려운 고객군 > 비용 효율화가 필요
+]
+
+---
+
+class: split-50, center
+
+# gitops push vs pull
+
+.column[.content.vmiddle.right[
+<img src=https://assets-global.website-files.com/622642781cd7e96ac1f66807/64b6277cc28963be1e445f19_image2.png width=90%>
+]]
+.column[.content.vmiddle.left[
+<img src=https://assets-global.website-files.com/622642781cd7e96ac1f66807/64b627abe8bc34df56721ca1_image15.png width=90%>
+]]
 
 ---
 
 # flux
 
-flux는 pull 방식의 gitops를 제공하는 도구임.
-push 방식에서는 그 자체의 문제는 아니지만, 상태를 들고 있는 주체가 없는 설계가 많음
-그러면 클라우드에 직접 선언을 반영하고 중간에 관리하는 상태가 없어짐
 
-pull 방식은 방식의 특성상 pull해가야 하는 주체가 항상 동작중이며, 
-그 주체가 현태 상태와 같은지 확인하는 과정을 수행할 수 있음.
-
-그래서 pull 방식의 도구 중 argoCD vs flux에서 flux를 선택하게 됨.
 
 ---
 
