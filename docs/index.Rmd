@@ -30,6 +30,19 @@ class: center, middle, title-slide
 ### 2024년 1월 20일
 
 ---
+
+class: center, middle, title-slide
+
+# fluxplane
+## ~~crossplane과 flux로 구축하는 Infra as code~~
+## 본격 야믈러(yamler)의 길
+### <https://mrchypark.github.io/fluxplane>
+
+### 박찬엽
+
+### 2024년 1월 20일
+
+---
 class: split-50 
 
 .column[.content.vmiddle.right[
@@ -60,16 +73,16 @@ class: split-50
 
 ---
 
-class: split-40 
+class: split-two
 
 .column[.content.left[
-.split-20[.column[
+.split-10[.column[
 ]
 .column[.content[
 <br>
-## Conalog
+## .green[Conalog]
 
-#### 태양광 패널별 모니터링 및 디지털 O&M 
+### 태양광 패널별 모니터링 및 디지털 O&M 
 
 - 패널별 모니터링을 위한 IoT 장치
 - 데이터 수집을 위한 엣지 컴퓨터
@@ -77,11 +90,93 @@ class: split-40
 - 모니터링 대시보드
 
 ]]]]]
-.column[.content.right[
+.column[.content.left[
 <br>
 <br>
-<img src="https://user-images.githubusercontent.com/6179259/298202115-438ed345-ed4a-48a1-a6f3-8a9b8d933759.png" width=100%>
+<img src="https://user-images.githubusercontent.com/6179259/298209767-0fe401db-5a1e-4057-88bd-a115525a9618.png" width=90%>
 ]]
 
 ---
 
+초짜 cto가 회사에 오니
+
+4명이서 
+펌웨어
+데이터 수집
+데이터 인프라 운영
+서비스 개발
+데이터 분석
+고객 대응
+
+을 다 해야 함
+
+그래서
+
+가능한한 운영을 자동화해야겠다 판단함.
+
+infra as code의 등장
+
+기존 방식
+포털에서 GUI로 리소스를 만들고 사용함.
+문제점
+잘못 만들면 어떤 설정을 통해서 잘못 만들었는지 파악하고 처음부터 다시해야 함
+근데, 클라우드는 기능도 도구도 너무 많고
+잘못만들어서 실패하려면 실제로 만드는 시간을 기다려야 함.
+
+!문제점!
+학습 사이클이 너무 긴데, 사전에 알 방법이 없다.
+
+사전에 알 방법은 해결할 수 없는 문제,
+학습 사이클을 줄이거나 이 부분을 점진적으로 나아갈 방법이 필요함.
+
+
+그나마 불필요한 반복을 줄이는 방법은 !기록!
+
+그렇다면 기록된 그대로 실행되면 어떨까?
+
+클라우드프로바이더가 리소스 api를 제공함.
+그래서 가장 접근하기 쉬운 방식은 api를 사용하는 것.
+cp가 openapi spec 같은걸 제공한다면 원하는 언어로 만든 sdk를 사용할 수 있을 것
+
+하지만 실패처리, 리소스간 의존성 등 직접 작성하는 것이 쉬운 일이 아님.
+그래서 infra as code에 선언적 방식의 의미가 들어간 것 같음.
+
+terraform / pulumi / cdk 등
+terraform
+모든 프로바이더를 아우르는 사실상 표준
+hcl
+
+pulumi는 terraform을 여러 언어로 감쌌음.
+왜 그랬냐? 아마도 새로운 문법을 익히는 것에 대한 허들이 작용한 듯.
+cdk는 aws 의 도구로 cloudformation을 감싼 형태로 되어 있음.
+
+
+
+
+
+
+
+
+내가 전달하고 싶은 것.
+crossplane 소개
+flux는 왜 들어갔는가?
+
+결국 배포 편의성이 필요했음.
+
+crossplane으로만 할 때는 정의가 많이 필요함
+
+manifest > helm > helmfile
+뭔가 잘못된거 같음
+
+helm이 온전히 잘 설계되어 있지 않다면 문제를 파악하는데, 너무 어려움이 많음.
+
+manifest > kustomize > xrd > crd
+모두 krm 형식을 유지할 수 있고, 수준에 따라 구현을 선택할 수 있음
+
+현재 기술 스택은 아래와 같이 되어 있음
+management cluster > 클라우드 리소스 선언 및 관리 & flux 운영
+
+dev cluster
+monitoring cluster
+prod cluster
+edge cluster
