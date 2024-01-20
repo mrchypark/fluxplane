@@ -316,54 +316,163 @@ class: split-50, center
 
 ---
 
-# flux
-
-
-
----
-
-# flux
-
-artifact를 만들 source와 controller로 구성됨.
-
-source는 반영해야 할 선언들의 원천
-controller는 그 선언을 반영하는 operator.
-
-```yaml
-
-```
-
----
-
-# 선택한 구성
-
-git repository
-helm repository
-*oci repository*
-bucket
-helm chart
-
-*kustomize controller*
-helm controller
+<img src=https://res.cloudinary.com/practicaldev/image/fetch/s--h6N6LZe---/c_limit%2Cf_auto%2Cfl_progressive%2Cq_66%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ijxhxd2g7br5szq7l8gb.gif width=100%>
 
 ---
 
 # flux kustomization
 
-flux가 기본 kustomize의 단점 보완해줌.
-
-의존성
-
-healthcheck
-
+### 명시적인 의존성 작성
 
 ```yaml
-
-
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: certs
+  namespace: flux-system
+spec:
+*  dependsOn:
+*    - name: cert-manager
+  interval: 5m
+  path: "./cert-manager/certs"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
 ```
 
 ---
 
+# flux kustomization
+
+### health check
+
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: backend
+  namespace: default
+spec:
+  interval: 5m
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: webapp
+*  healthChecks:
+*    - apiVersion: apps/v1
+*      kind: Deployment
+*      name: backend
+*      namespace: dev
+```
+
+
+---
+
+class: split-50
+
 # fluxplane
 
-![](https://user-images.githubusercontent.com/6179259/298268125-630be0ee-c7ad-479f-9cda-806c50ff283f.png)
+.column[.content.vmiddle.right[
+<img src=imgs/fluxplane-cluster.png>
+]]
+
+.column[.content.vmiddle.left[
+.large[flux: 리소스 정의 파일 배포
+
+crossplane: 클라우드 리소스 배포]
+]]
+
+???
+
+```d2
+git -> oci: 아티팩트 배포(push)
+
+oci: oci registry
+
+fc: fluxplane {
+  flux: {
+    artifact
+    controller: kustomize controller
+    controller -> artifact: config
+  }
+
+  flux.controller -> crds: cloud resource deploy
+  crossplane -> crds: config
+}
+
+fc.kubeconfig <- cluster: credentials
+
+oci <- fc.flux: pull
+oci -> fc.flux.artifact: resource files
+
+fc.crossplane -> cluster: cluster deploy
+
+cluster: {
+  k8s-resources
+}
+
+```
+---
+
+class: split-50
+
+# fluxplane
+
+.column[.content.vmiddle.right[
+<img src=imgs/fluxplane-resource.png>
+]]
+
+.column[.content.vmiddle.left[
+.large[flux: 리소스 정의 파일 배포
+
+crossplane: 클라우드 리소스 배포]
+]]
+
+???
+
+```d2
+git -> oci: 아티팩트 배포(push)
+
+oci: oci registry
+
+fc: fluxplane {
+  flux: {
+    artifact
+    controller: kustomize controller
+    controller -> artifact: config
+  }
+
+  kubeconfig -- flux.controller
+}
+
+fc.flux.controller -> cluster.k8s-resources
+
+oci <- fc.flux: pull
+oci -> fc.flux.artifact: resource files
+
+cluster: {
+  k8s-resources
+}
+```
+
+---
+
+class: center, middle, title-slide
+
+# 이제 패키징 문제를 해결해보자
+
+---
+
+class: middle, title-slide
+
+# - kustomize componant
+
+# - crossplane xrd
+
+# - operator
+
+---
+
+# crossplane xrd(Composite Resource Definitions)
+
