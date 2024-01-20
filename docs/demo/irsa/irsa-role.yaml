@@ -1,0 +1,24 @@
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Role
+metadata:
+  name: did
+spec:
+  forProvider:
+    assumeRolePolicy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Federated": "arn:aws:iam::111111111111:oidc-provider/oidc.eks.ap-northeast-2.amazonaws.com/id/XXXXXXXXXXXXX1D4664065DCA7"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+              "StringEquals": {
+                "oidc.eks.ap-northeast-2.amazonaws.com/id/XXXXXXXXXXXXX1D4664065DCA7:sub": "system:serviceaccount:default:did"
+              }
+            }
+          }
+        ]
+      }

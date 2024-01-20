@@ -1,0 +1,21 @@
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: did-storage-attachment
+spec:
+  forProvider:
+    policyArnRef:
+      name: did-storage
+    roleRef:
+      name: did
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: UserPolicyAttachment
+metadata:
+  name: did-user-storage-attachment
+spec:
+  forProvider:
+    policyArnRef:
+      name: did-storage
+    userRef:
+      name: did-user

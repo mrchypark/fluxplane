@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: did
+  labels:
+    app: did
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: did
+  template:
+    metadata:
+      labels:
+        app: did
+    spec:
+      containers:
+      - name: did
+        image: 111111111111.dkr.ecr.ap-northeast-2.amazonaws.com/did:20240306-98602e6
+        ports:
+        - name: tcp
+          containerPort: 8090
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: tcp
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: tcp
+      serviceAccountName: did
