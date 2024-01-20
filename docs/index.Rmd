@@ -474,5 +474,49 @@ class: middle, title-slide
 
 ---
 
-# crossplane xrd(Composite Resource Definitions)
+# crossplane xrd
+## Composite Resource Definitions
 
+.large[crossplane도 k8s 확장과 같이 자체 확장을 제공함]
+
+---
+# crossplane xrd
+
+[예시코드](https://github.com/mrchypark/fluxplane/tree/main/demo/irsa)
+
+```yaml
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xdatabases.custom-api.example.org
+spec:
+  group: custom-api.example.org
+  names:
+    kind: xDatabase
+    plural: xdatabases
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              region:
+                type: string
+...
+```
+---
+
+class: center, middle, title-slide
+
+# fluxplane의 길
+
+---
+
+class: center, middle, title-slide
+
+# fluxplane의 길
+# ~= 
+# yamler의 길
